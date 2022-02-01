@@ -17,9 +17,9 @@ class StudyTimer():
         self.title_text = Font(family='Times New Roman', size=20, weight='bold')
         self.menu_text = Font(family='Times New Roman', size=10, weight='bold')
         
-        study_default = 1
-        break_default = 1
-        interval_default = '1'
+        study_default = 25
+        break_default = 5
+        interval_default = '4'
         
 
         #Styles
@@ -134,6 +134,7 @@ class StudyTimer():
 
 root = tk.Tk()
 root.title('StudyTimer')
+root.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
 root.geometry('350x200')
 Timer = StudyTimer(root)
 #cProfile.run(Timer.timer())
