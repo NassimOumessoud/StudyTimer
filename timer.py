@@ -12,7 +12,13 @@ import cProfile
 
 
 class StudyTimer():
-    def __init__(self, main):
+    def __init__(self):
+        main = tk.Tk()
+        main.title('StudyTimer')
+        main.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
+        main.geometry('350x200')
+
+        
         self.main = main
         
         background_color = '#5dade2'
@@ -62,16 +68,19 @@ class StudyTimer():
         self.intervals.insert(0, interval_default)
         self.intervals.grid(column=1, row=3, sticky="W")
 
-        print('done')
-        ttk.Button(self.setupFrame, text="Start", command=self.init_countdown()).grid(column=0, row=5)
+
+        ttk.Button(self.setupFrame, text="Start", command=threading.Thread(target=self.init_countdown).start).grid(column=0, row=5)
         ttk.Button(self.setupFrame, text="Exit", command=main.destroy).grid(column=1, row=5)
-        
+        main.mainloop()
        
+
     def countdown(self, value, intro_line, study=True):
-        secs = 59
         
+        self.label = ttk.Label(self.countdownFrame, text=f"{value} : 59", style='TLabel')
+        self.label.grid(column=2, row=0) 
+        secs = 59
         while value >= 0:
-            self.label['text'] = f"{value} : {secs}"      
+            self.label.config(text=f"{value} : {secs}")      
 
             time.sleep(1)
             secs -= 1
@@ -84,45 +93,35 @@ class StudyTimer():
         self.setupFrame.grid_forget()
         self.welcome.grid_forget()
 
-        self.countdownFrame = ttk.Frame(self.main)
-        self.countdownFrame.grid(column=1, row=1)
-
-        self.study_label = ttk.Label(self.countdownFrame, text="Study time left -")
-        self.break_label = ttk.Label(self.countdownFrame, text="Break time left -")
-
 
         intervals = int(self.intervals.get())
-        study_lines = ["Let's start!","Let the learning begin."]
+        study = int(self.high.get()) - 1
+        pause = int(self.low.get()) - 1
 
+        study_lines = ["Let's start!","Let the learning begin."]
         break_lines = ["Good study, have a break!",
                         "Nice job, you deserve a break!",
                         "It's time for a break"]
 
-        
-        study = int(self.high.get()) - 1
-        pause = int(self.low.get()) - 1
         study_line = random.choice(study_lines)
         break_line = random.choice(break_lines)
-            
+        
+
+        self.countdownFrame = ttk.Frame(self.main)
+        self.countdownFrame.grid(column=1, row=1)
+
         for interval in range(intervals):
-            interval += 1
-
-            self.study_label.grid(column=0, row=0)
-            self.study_label.grid_forget()
-            self.label = ttk.Label(self.countdownFrame, text=f"{study} : 59", style='TLabel')
-            self.label.grid(column=2, row=0) 
-            count = threading.Thread(target=self.countdown, args=(study, study_line))
-            count.start()
             
+            interval += 1
+            self.countdown_Label = ttk.Label(self.countdownFrame, text="Study time left -")
+            self.countdown(study, study_line)
 
-            self.break_label.grid(column=0, row=0)
+            self.countdown_Label.config(text="Break time left -")
             self.countdown(pause, break_line, study=False)
-            self.break_label.grid_forget()
+
 
             if interval == intervals:
-                study = int(self.high.get())
-                pauze = int(self.low.get())
-                print(f"Congratulations! you've studied for {round((study+pauze)*intervals/60, 1)} hours!")
+                print(f"Congratulations! you've studied for {round((study+pause)*intervals/60, 1)} hours!")
                 self.countdownFrame.destroy()
                 self.welcome.grid()
                 self.setupFrame.grid()
@@ -130,10 +129,5 @@ class StudyTimer():
         
 
 
-root = tk.Tk()
-root.title('StudyTimer')
-root.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
-root.geometry('350x200')
-Timer = StudyTimer(root)
-#cProfile.run(Timer.timer())
-root.mainloop()
+StudyTimer()
+
