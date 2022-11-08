@@ -2,14 +2,16 @@ from argparse import Action
 from cgitb import text
 from concurrent.futures import thread
 from ipaddress import collapse_addresses
+from msilib.schema import Class
 import tkinter as tk
-from tkinter import ttk
+from tkinter import HORIZONTAL, ttk
 from tkinter.font import Font
 
 import time
 import threading
 import random
 import cProfile
+from turtle import bgcolor, width
 
 
 class StudyTimer():
@@ -20,20 +22,27 @@ class StudyTimer():
         main.title('StudyTimer')
         main.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
         main.geometry('350x200')
-
         self.main = main
+
+        self.style()
+        self.setup_widget()
+        self.create_menu(items={"Exit": self.main.destroy, "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
         
+        main.mainloop()
+        
+
+    def style(self):
         #Styles
-        background_color = '#5dade2'
+        self.background_color = '#5dade2'
         menu_color = '#DAF7A6'
         self.title_text = Font(family='Times New Roman', size=20, weight='bold')
         self.menu_text = Font(family='Times New Roman', size=10, weight='bold')
 
-        self.main.config(bg=background_color)
+        self.main.config(bg=self.background_color)
 
         title_style = ttk.Style()
         title_style.theme_use("default")
-        title_style.configure('TLabel', background=background_color, font=self.title_text)
+        title_style.configure('TLabel', background=self.background_color, font=self.title_text)
 
         self.menu_style = ttk.Style()
         self.menu_style.configure('Menu.TLabel', background=menu_color, font=self.menu_text)
@@ -43,20 +52,16 @@ class StudyTimer():
         spinboxstyle.configure('My.TSpinbox', arrowsize=20) 
         self.spinfont = Font(family='Times New Roman', size=20, weight="bold")
 
-        self.setup_widget()
-        self.create_menu(items={'Exit': self.main.destroy,'Music': None, 'Timer': pass})
-
-        main.mainloop()
-        
 
     def setup_widget(self):
         #Widget setup
+        self.welcome = self.create_label(text="Welcome to your study timer!", style="TLabel")
+
+
+    def setup_timer(self):
         study_default = 25
         break_default = 5
         interval_default = '4'
-
-        self.welcome = self.create_label(text="Welcome to your study timer!", style="TLabel")
-
         self.setupFrame = ttk.Frame(self.main, style='TLabel', padding=10)
         self.setupFrame.grid(column=0, row=1)
         
@@ -71,13 +76,11 @@ class StudyTimer():
         self.low.set(break_default)
 
         self.create_label(frame=self.setupFrame, text="Amount of intervals", style='Menu.TLabel', grid=(3,0))
-        self.intervals = ttk.Entry(self.setupFrame, width=1, font=self.spinfont)
+        self.intervals = ttk.Entry(self.setupFrame, width=2, font=self.spinfont)
         self.intervals.insert(0, interval_default)
         self.intervals.grid(column=1, row=3, sticky="W")
 
-
         ttk.Button(self.setupFrame, text="Start", command=threading.Thread(target=self.init_countdown).start).grid(column=0, row=5)
-        ttk.Button(self.setupFrame, text="Exit", command=self.main.destroy).grid(column=1, row=5)
 
 
     def create_menu(self, items={}):
@@ -88,7 +91,7 @@ class StudyTimer():
         menu_file = Menu(menubar)
 
         for item in items:
-            menubar.add_command(label=item.key, command=item.value)
+            menubar.add_command(label=item, command=items[item])
 
 
     def create_label(self, frame=None, text='', style='TLabel', grid=(0,0), packing=False):
@@ -103,15 +106,19 @@ class StudyTimer():
         else: 
             label.grid(row=grid[0], column=grid[1], sticky="W")
 
-        return label
+        return label   
 
-       
 
     def countdown(self, value, intro_line, study=True):
-        
+        end_time = (value+1)*60
+        progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=end_time, value=0)
+        progressbar.grid(row=10, column=0, columnspan=5)
+
         self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(0,2))
         secs = 59
+
         while True:
+            progressbar.config(value=end_time-(value*60 + secs))
             self.label.config(text=f"{value} : {secs}")      
             time.sleep(1)
             secs -= 1
@@ -160,6 +167,24 @@ class StudyTimer():
                 self.setupFrame.grid()
                 break
         
+
+
+class Calculator():
+    def __init__(self, style=None):
+        main = tk.Tk()
+        main.title('Calculator')
+        main.geometry('350x200')
+        self.main = main
+
+        self.equation = ttk.Entry(self.main, width=20)
+        self.equation.grid(row=0, column=0)
+        button = ttk.Button(self.main, text='Calculate', command=self.calculate).grid(row=3, column=0)
+        main.mainloop()
+
+    def calculate(self):
+        equation = self.equation.get()
+        self.equation.delete(0, 'end')
+        self.equation.insert(0, eval(equation))
 
 
 StudyTimer()
