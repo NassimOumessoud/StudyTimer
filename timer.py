@@ -147,16 +147,16 @@ class StudyTimer():
         study_line = random.choice(study_lines)
         break_line = random.choice(break_lines)
 
-        self.countdownFrame = ttk.Frame(self.main)
+        self.countdownFrame = ttk.Frame(self.main, style='TLabel', padding=10)
         self.countdownFrame.grid(column=1, row=1)
 
         for interval in range(intervals):
             
             interval += 1
-            self.countdown_Label = ttk.Label(self.countdownFrame, text="Study time left -").grid(row=0, column=0)
+            self.countdown_label = self.create_label(frame=self.countdownFrame, text="Study time left -", style='TLabel', grid=(0,0))
             self.countdown(study, study_line)
 
-            self.countdown_Label.config(text="Break time left -").grid(row=0, column=0)
+            self.countdown_label.config(text="Break time left -")
             self.countdown(pause, break_line, study=False)
 
 
