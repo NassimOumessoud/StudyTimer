@@ -12,6 +12,7 @@ import threading
 import random
 import cProfile
 from turtle import bgcolor, width
+import playsound
 
 
 class StudyTimer():
@@ -44,8 +45,13 @@ class StudyTimer():
         title_style.theme_use("default")
         title_style.configure('TLabel', background=self.background_color, font=self.title_text)
 
+        frame_style = ttk.Style()
+        frame_style.configure(style='TFrame', background=self.background_color)
         self.menu_style = ttk.Style()
         self.menu_style.configure('Menu.TLabel', background=menu_color, font=self.menu_text)
+
+        entry_style = ttk.Style()
+        entry_style.configure(style='TEntry', background=self.background_color)
 
         spinboxstyle = ttk.Style()
         spinboxstyle.theme_use('default')
@@ -118,16 +124,23 @@ class StudyTimer():
         secs = 59
 
         while True:
-            progressbar.config(value=end_time-(value*60 + secs))
+            current_time = value*60 + secs
+            progressbar.config(value=end_time - current_time)
             self.label.config(text=f"{value} : {secs}")      
             time.sleep(1)
             secs -= 1
 
+
             if secs == 0:
                 if value == 0:
+                    self.play_sound('alarm.mp3')
                     return
                 value -= 1
                 secs = 59
+
+
+    def play_sound(self, sound_file):
+        playsound.playsound(sound_file)
 
 
     def init_countdown(self):
@@ -164,27 +177,35 @@ class StudyTimer():
                 print(f"Congratulations! you've studied for {round((study+pause)*intervals/60, 1)} hours!")
                 self.countdownFrame.destroy()
                 self.welcome.grid()
-                self.setupFrame.grid()
+                self.setupFrame.grid(row=1)
                 break
         
 
 
 class Calculator():
-    def __init__(self, style=None):
+    def __init__(self):
         main = tk.Tk()
         main.title('Calculator')
         main.geometry('350x200')
         self.main = main
 
-        self.equation = ttk.Entry(self.main, width=20)
+        StudyTimer.style(self)
+        self.frame = ttk.Frame(self.main, style='TFrame', padding=20)
+        self.frame.pack()
+
+        self.equation = ttk.Entry(self.frame, style='TEntry', width=13)
+        self.equation.bind('<Return>', self.calculate)
         self.equation.grid(row=0, column=0)
-        button = ttk.Button(self.main, text='Calculate', command=self.calculate).grid(row=3, column=0)
+
+        button = ttk.Button(self.frame, text='Calculate', width=13, command=self.calculate).grid(row=3, column=0)
         main.mainloop()
+
 
     def calculate(self):
         equation = self.equation.get()
         self.equation.delete(0, 'end')
         self.equation.insert(0, eval(equation))
+
 
 
 StudyTimer()
