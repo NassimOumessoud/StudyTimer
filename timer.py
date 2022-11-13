@@ -85,7 +85,7 @@ class StudyTimer():
         self.intervals = ttk.Entry(self.setupFrame, width=2, font=self.spinfont)
         self.intervals.insert(0, interval_default)
         self.intervals.grid(column=1, row=3, sticky="W")
-
+        
         ttk.Button(self.setupFrame, text="Start", command=threading.Thread(target=self.init_countdown).start).grid(column=0, row=5)
 
 
@@ -113,7 +113,7 @@ class StudyTimer():
             label.grid(row=grid[0], column=grid[1], sticky="W")
 
         return label   
-
+        
 
     def countdown(self, value, intro_line, study=True):
         end_time = (value+1)*60
@@ -144,13 +144,13 @@ class StudyTimer():
 
 
     def init_countdown(self):
-        self.setupFrame.grid_forget()
-        self.welcome.grid_forget()
-
 
         intervals = int(self.intervals.get())
         study = int(self.high.get()) - 1
         pause = int(self.low.get()) - 1
+
+        self.setupFrame.destroy()
+        self.welcome.destroy()
 
         study_lines = ["Let's start!","Let the learning begin."]
         break_lines = ["Good study, have a break!",
@@ -176,8 +176,7 @@ class StudyTimer():
             if interval == intervals:
                 print(f"Congratulations! you've studied for {round((study+pause)*intervals/60, 1)} hours!")
                 self.countdownFrame.destroy()
-                self.welcome.grid()
-                self.setupFrame.grid(row=1)
+                self.setup_timer()
                 break
         
 
