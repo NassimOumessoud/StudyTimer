@@ -26,6 +26,7 @@ class StudyTimer():
         self.main = main
 
         self.style()
+        self.timer = False
         self.setup_widget()
         self.create_menu(items={"Exit": self.main.destroy, "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
         
@@ -65,6 +66,10 @@ class StudyTimer():
 
 
     def setup_timer(self):
+        if self.timer:
+            print('Studytimer is already active.')
+            return
+
         study_default = 25
         break_default = 5
         interval_default = '4'
@@ -140,11 +145,12 @@ class StudyTimer():
 
 
     def play_sound(self, sound_file):
-        playsound.playsound(sound_file)
+        playsound.playsound(sound_file, block=False)
 
 
     def init_countdown(self):
-
+        
+        self.timer = True
         intervals = int(self.intervals.get())
         study = int(self.high.get()) - 1
         pause = int(self.low.get()) - 1
