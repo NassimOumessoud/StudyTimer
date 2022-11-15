@@ -175,15 +175,15 @@ class StudyTimer():
             self.countdown_label = self.create_label(frame=self.countdownFrame, text="Study time left -", style='TLabel', grid=(0,0))
             self.countdown(study, study_line)
 
-            self.countdown_label.config(text="Break time left -")
-            self.countdown(pause, break_line, study=False)
-
-
             if interval == intervals:
-                print(f"Congratulations! you've studied for {round((study+pause)*intervals/60, 1)} hours!")
+                print(f"Congratulations! you've studied for {round((study+pause+2)*intervals/60, 1)} hours!")
                 self.countdownFrame.destroy()
+                self.timer = False
                 self.setup_timer()
                 break
+
+            self.countdown_label.config(text="Break time left -")
+            self.countdown(pause, break_line, study=False)
         
 
 
@@ -192,6 +192,7 @@ class Calculator():
         main = tk.Tk()
         main.title('Calculator')
         main.geometry('350x200')
+        main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
         self.main = main
 
         StudyTimer.style(self)
