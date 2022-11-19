@@ -186,6 +186,8 @@ class StudyTimer():
             self.countdown(pause, break_line, study=False)
         
 
+import cmath
+
 
 class Calculator():
     def __init__(self):
@@ -195,23 +197,53 @@ class Calculator():
         main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
         self.main = main
 
+        self.symbols = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'ln': self.log, }
+        self.decimals = 3
+
         StudyTimer.style(self)
         self.frame = ttk.Frame(self.main, style='TFrame', padding=20)
         self.frame.pack()
 
-        self.equation = ttk.Entry(self.frame, style='TEntry', width=13)
-        self.equation.bind('<Return>', self.calculate)
-        self.equation.grid(row=0, column=0)
+        self.entry = ttk.Entry(self.frame, style='TEntry', width=13)
+        self.entry.bind('<Return>', self.calculate)
+        self.entry.grid(row=0, column=0)
 
         button = ttk.Button(self.frame, text='Calculate', width=13, command=self.calculate).grid(row=3, column=0)
         main.mainloop()
 
 
     def calculate(self):
-        equation = self.equation.get()
-        self.equation.delete(0, 'end')
-        self.equation.insert(0, eval(equation))
+        self.equation = self.entry.get()
+        self.entry.delete(0, 'end')
+        try:
+            self.entry.insert(0, eval(self.equation))
 
+        except NameError or SyntaxError as error:
+            error = error.args[0].split("'")[1] 
+            if error in self.symbols.keys():
+                self.symbols[error]()
+
+    def integral(self):
+        pass
+
+    def derivative(self):
+        print('do derivative')
+        pass
+
+    def exponential(self):
+        try:
+            self.equation = float(self.equation.split("(")[1][:-1])
+        except:
+            print(Exception)
+            print(self.equation)
+        self.answer = cmath.exp(self.equation)
+        if self.answer.imag:
+            self.entry.insert(0, self.answer)
+        else:
+            self.entry.insert(0, round(self.answer.real, self.decimals))
+
+    def log(self):
+            pass
 
 
 StudyTimer()
