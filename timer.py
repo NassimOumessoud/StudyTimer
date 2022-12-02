@@ -25,6 +25,11 @@ class StudyTimer():
         main.geometry('350x200')
         self.main = main
 
+        tk.Grid.rowconfigure(self.main,0,weight=1)
+        tk.Grid.columnconfigure(self.main,0,weight=1)
+    
+        #tk.Grid.rowconfigure(self.main,1,weight=1)
+
         self.style()
         self.timer = False
         self.setup_widget()
@@ -73,7 +78,7 @@ class StudyTimer():
         study_default = 25
         break_default = 5
         interval_default = '4'
-        self.setupFrame = ttk.Frame(self.main, style='TLabel', padding=10)
+        self.setupFrame = ttk.Frame(self.main, style='TLabel',  padding=10)
         self.setupFrame.grid(column=0, row=1)
         
         self.create_label(frame=self.setupFrame, text="Study minutes", style='Menu.TLabel', grid=(1,0))
@@ -197,9 +202,15 @@ class Calculator():
         main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
         self.main = main
 
-        self.symbols = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'ln': self.log, }
+        self.functions = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'ln': self.log, }
+        self.symbols = {'i': complex(0, 1), 'j': complex(0, 1), 'pi': cmath.pi, 'Pi': cmath.pi}
         self.decimals = 3
 
+        self.setup()
+        main.mainloop()
+
+
+    def setup(self):
         StudyTimer.style(self)
         self.frame = ttk.Frame(self.main, style='TFrame', padding=20)
         self.frame.pack()
@@ -209,7 +220,6 @@ class Calculator():
         self.entry.grid(row=0, column=0)
 
         button = ttk.Button(self.frame, text='Calculate', width=13, command=self.calculate).grid(row=3, column=0)
-        main.mainloop()
 
 
     def calculate(self):
@@ -220,27 +230,34 @@ class Calculator():
 
         except NameError or SyntaxError as error:
             error = error.args[0].split("'")[1] 
-            if error in self.symbols.keys():
-                self.symbols[error]()
+            if error in self.functions.keys():
+                self.functions[error]()
+
 
     def integral(self):
         pass
+
 
     def derivative(self):
         print('do derivative')
         pass
 
+
     def exponential(self):
+        self.equation = self.equation.split("(")[1][:-1]
         try:
-            self.equation = float(self.equation.split("(")[1][:-1])
+            self.answer = cmath.exp(float(self.equation))
         except:
-            print(Exception)
+            for key in self.equation:
+                print(key)
+                if key in self.symbols.keys():
+                    pass
+            
+                
             print(self.equation)
-        self.answer = cmath.exp(self.equation)
-        if self.answer.imag:
+            self.answer = cmath.exp(float(self.equation))
             self.entry.insert(0, self.answer)
-        else:
-            self.entry.insert(0, round(self.answer.real, self.decimals))
+
 
     def log(self):
             pass
