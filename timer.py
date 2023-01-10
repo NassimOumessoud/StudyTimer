@@ -6,6 +6,7 @@ from msilib.schema import Class
 import tkinter as tk
 from tkinter import HORIZONTAL, ttk
 from tkinter.font import Font
+from PIL import Image
 
 import time
 import threading
@@ -22,7 +23,7 @@ class StudyTimer():
         main = tk.Tk()
         main.title('StudyTimer')
         main.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
-        main.geometry('350x200')
+        main.geometry('420x200')
         self.main = main
 
         tk.Grid.rowconfigure(self.main,0,weight=1)
@@ -66,8 +67,12 @@ class StudyTimer():
 
 
     def setup_widget(self):
-        #Widget setup
         self.welcome = self.create_label(text="Welcome to your study timer!", style="TLabel")
+        #self.image = ImageTK.open('nature.png')
+        #self.image.resize((420, 200))
+        #self.canvas = tk.Canvas(self.main)
+        #self.canvas.grid(row=0, column=0)
+        #self.canvas.create_image(0, 0, image=self.image)
 
 
     def setup_timer(self):
@@ -79,7 +84,9 @@ class StudyTimer():
         break_default = 5
         interval_default = '4'
         self.setupFrame = ttk.Frame(self.main, style='TLabel',  padding=10)
-        self.setupFrame.grid(column=0, row=1)
+        self.setupFrame.grid(column=0, row=1, sticky='W')
+
+        self.welcome.config(text="How long would you like to study?")
         
         self.create_label(frame=self.setupFrame, text="Study minutes", style='Menu.TLabel', grid=(1,0))
         self.high = ttk.Spinbox(self.setupFrame, from_=0, to=60, width=2, style='My.TSpinbox', font=self.spinfont)
@@ -202,7 +209,7 @@ class StudyTimer():
                 print(f"Congratulations! you've studied for {round((study+pause+2)*intervals/60, 1)} hours!")
                 self.countdownFrame.destroy()
                 self.timer = False
-                self.setup_timer()
+                self.setup_widget()
                 break
 
             self.countdown_label.config(text="Break time left -")
