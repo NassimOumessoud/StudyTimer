@@ -126,39 +126,55 @@ class StudyTimer():
         
 
     def countdown(self, value, intro_line, study=True):
-        end_time = (value+1)*60
-        progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=end_time, value=0)
+        
+        progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=1, value=0)
         progressbar.grid(row=10, column=0, columnspan=5)
 
         self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(0,2))
-        secs = 59
+        
+        
+        end_time = (value)*60
+        progress = 0
 
-        while True:
+        value = value - 1
+        secs = 59
+        
+        while value >= 0:
             current_time = value*60 + secs
-            progressbar.config(value=end_time - current_time)
-            self.label.config(text=f"{value} : {secs}")      
+            progress = (end_time - current_time)/end_time
+            
+            progressbar.config(value=progress)
+            self.label.config(text=f"{value} : {secs}")     
+
             time.sleep(1)
             secs -= 1
 
-
             if secs == 0:
-                if value == 0:
-                    self.play_sound('alarm.mp3')
-                    return
                 value -= 1
                 secs = 59
+
+            if progress == .99:      #if progress at 99 percent sound alarm
+                self.play_sound('audio/alarm.mp3')
 
 
     def play_sound(self, sound_file):
         playsound.playsound(sound_file, block=False)
 
 
+    def pause(self):
+        self.pause = True
+        self.pausebutton.config(text="Resume", command=self.pause==False)
+        while self.pause:
+            print(1)
+        print(0)
+
+
     def init_countdown(self):
         
         self.timer = True
         intervals = int(self.intervals.get())
-        study = int(self.high.get()) - 1
-        pause = int(self.low.get()) - 1
+        study = int(self.high.get())
+        pause = int(self.low.get())
 
         self.setupFrame.destroy()
         self.welcome.destroy()
@@ -173,6 +189,8 @@ class StudyTimer():
 
         self.countdownFrame = ttk.Frame(self.main, style='TLabel', padding=10)
         self.countdownFrame.grid(column=1, row=1)
+        self.pausebutton = ttk.Button(self.countdownFrame, text="Pause", command=self.pause)
+        self.pausebutton.grid(column=0, row=1)
 
         for interval in range(intervals):
             
@@ -202,7 +220,7 @@ class Calculator():
         main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
         self.main = main
 
-        self.functions = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'ln': self.log, }
+        self.functions = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'log': self.log, 'ln': self.naturalLog}
         self.symbols = {'i': complex(0, 1), 'j': complex(0, 1), 'pi': cmath.pi, 'Pi': cmath.pi}
         self.decimals = 3
 
@@ -260,7 +278,15 @@ class Calculator():
 
 
     def log(self):
-            pass
+        self.equation = self.equation.split("(")[1][:-1]
+        self.answer = cmath.log10(float(self.equation))
+        self.entry.insert(0, self.answer)
+
+    
+    def naturalLog(self):
+        self.equation = self.equation.split("(")[1][:-1]
+        self.answer = cmath.log(float(self.equation))
+        self.entry.insert(0, self.answer)
 
 
 StudyTimer()
