@@ -25,6 +25,7 @@ class StudyTimer():
         main.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
         main.geometry('420x200')
         self.main = main
+        self.paused = False
 
         tk.Grid.rowconfigure(self.main,0,weight=1)
         tk.Grid.columnconfigure(self.main,0,weight=1)
@@ -54,6 +55,7 @@ class StudyTimer():
 
         frame_style = ttk.Style()
         frame_style.configure(style='TFrame', background=self.background_color)
+
         self.menu_style = ttk.Style()
         self.menu_style.configure('Menu.TLabel', background=menu_color, font=self.menu_text)
 
@@ -130,50 +132,16 @@ class StudyTimer():
             label.grid(row=grid[0], column=grid[1], sticky="W")
 
         return label   
-        
-
-    def countdown(self, value, intro_line, study=True):
-        
-        progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=1, value=0)
-        progressbar.grid(row=10, column=0, columnspan=5)
-
-        self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(0,2))
-        
-        
-        end_time = (value)*60
-        progress = 0
-
-        value = value - 1
-        secs = 59
-        
-        while value >= 0:
-            current_time = value*60 + secs
-            progress = (end_time - current_time)/end_time
-            
-            progressbar.config(value=progress)
-            self.label.config(text=f"{value} : {secs}")     
-
-            time.sleep(1)
-            secs -= 1
-
-            if secs == 0:
-                value -= 1
-                secs = 59
-
-            if progress == .99:      #if progress at 99 percent sound alarm
-                self.play_sound('audio/alarm.mp3')
-
-
-    def play_sound(self, sound_file):
-        playsound.playsound(sound_file, block=False)
 
 
     def pause(self):
-        self.pause = True
-        self.pausebutton.config(text="Resume", command=self.pause==False)
-        while self.pause:
-            print(1)
-        print(0)
+        if self.paused:
+            self.paused = False
+            self.pausebutton.configure(text="Pause")
+            return
+
+        self.paused = True
+        self.pausebutton.configure(text="Resume")
 
 
     def init_countdown(self):
@@ -199,6 +167,9 @@ class StudyTimer():
         self.pausebutton = ttk.Button(self.countdownFrame, text="Pause", command=self.pause)
         self.pausebutton.grid(column=0, row=1)
 
+        self.backbutton = ttk.Button(self.countdownFrame, text="Exit", command=self.end_countdown)
+        self.backbutton.grid(column=1, row=1)
+
         for interval in range(intervals):
             
             interval += 1
@@ -207,13 +178,57 @@ class StudyTimer():
 
             if interval == intervals:
                 print(f"Congratulations! you've studied for {round((study+pause+2)*intervals/60, 1)} hours!")
-                self.countdownFrame.destroy()
-                self.timer = False
-                self.setup_widget()
+                self.end_countdown()
                 break
 
             self.countdown_label.config(text="Break time left -")
             self.countdown(pause, break_line, study=False)
+
+
+    def end_countdown(self):
+        self.countdownFrame.destroy()
+        self.timer = False
+        self.setup_widget()
+        
+
+    def countdown(self, value, intro_line, study=True):
+        
+        progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=1, value=0)
+        progressbar.grid(row=10, column=0, columnspan=5)
+
+        self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(0,2))
+        
+        
+        end_time = (value)*60
+        progress = 0
+
+        value = value - 1
+        secs = 59
+        
+        while value >= 0:
+            if self.paused:
+                continue
+
+            current_time = value*60 + secs
+            progress = (end_time - current_time)/end_time
+            
+            progressbar.config(value=progress)
+            self.label.config(text=f"{value} : {secs}")     
+
+            time.sleep(1)
+            secs -= 1
+
+            if secs == 0:
+                value -= 1
+                secs = 59
+
+            if value == 0:
+                if secs == 6:
+                    self.play_sound('audio/alarm.mp3')
+             
+
+    def play_sound(self, sound_file):
+        playsound.playsound(sound_file, block=False)
         
 
 import cmath
@@ -224,9 +239,10 @@ class Calculator():
         main = tk.Tk()
         main.title('Calculator')
         main.geometry('350x200')
+        self.background_color = '#5dade2'
         main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
         self.main = main
-
+        self.main.config(bg=self.background_color)
         self.functions = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'log': self.log, 'ln': self.naturalLog}
         self.symbols = {'i': complex(0, 1), 'j': complex(0, 1), 'pi': cmath.pi, 'Pi': cmath.pi}
         self.decimals = 3
@@ -236,8 +252,11 @@ class Calculator():
 
 
     def setup(self):
-        StudyTimer.style(self)
-        self.frame = ttk.Frame(self.main, style='TFrame', padding=20)
+       
+        frame_style = ttk.Style()
+        frame_style.configure(style='TFrame', background=self.background_color)
+
+        self.frame = ttk.Frame(self.main, style='TFrame')
         self.frame.pack()
 
         self.entry = ttk.Entry(self.frame, style='TEntry', width=13)
