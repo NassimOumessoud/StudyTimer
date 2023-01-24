@@ -119,7 +119,7 @@ class StudyTimer():
             menubar.add_command(label=item, command=items[item])
 
 
-    def create_label(self, frame=None, text='', style='TLabel', grid=(0,0), packing=False):
+    def create_label(self, frame=None, text='', style='TLabel', grid=(0,0), cspan=1, rspan=1, packing=False):
 
         if frame == None:
             frame = self.main
@@ -128,8 +128,9 @@ class StudyTimer():
 
         if packing:
             label.pack()
+
         else: 
-            label.grid(row=grid[0], column=grid[1], sticky="W")
+            label.grid(row=grid[0], column=grid[1], rowspan=rspan, columnspan=cspan, sticky="W")
 
         return label   
 
@@ -163,17 +164,20 @@ class StudyTimer():
         break_line = random.choice(break_lines)
 
         self.countdownFrame = ttk.Frame(self.main, style='TLabel', padding=10)
-        self.countdownFrame.grid(column=1, row=1)
+        self.countdownFrame.grid(row=1, column=1)
         self.pausebutton = ttk.Button(self.countdownFrame, text="Pause", command=self.pause)
-        self.pausebutton.grid(column=0, row=1)
+        self.pausebutton.grid(row=5, column=0)
 
         self.backbutton = ttk.Button(self.countdownFrame, text="Exit", command=self.end_countdown)
-        self.backbutton.grid(column=1, row=1)
+        self.backbutton.grid(row=5, column=1)
+
+        self.intervallabel = self.create_label(frame=self.countdownFrame, text=f"Interval 1 / out of {intervals}", grid=(2, 0), cspan=2)
 
         for interval in range(intervals):
             
             interval += 1
-            self.countdown_label = self.create_label(frame=self.countdownFrame, text="Study time left -", style='TLabel', grid=(0,0))
+            self.countdown_label = self.create_label(frame=self.countdownFrame, text="Study time left -", style='TLabel', grid=(3,0))
+            self.intervallabel.config(text=f"Interval {interval} / out of {intervals}")
             self.countdown(study, study_line)
 
             if interval == intervals:
@@ -194,9 +198,9 @@ class StudyTimer():
     def countdown(self, value, intro_line, study=True):
         
         progressbar = ttk.Progressbar(self.countdownFrame, orient=HORIZONTAL,  length=300, maximum=1, value=0)
-        progressbar.grid(row=10, column=0, columnspan=5)
+        progressbar.grid(row=4, column=0, columnspan=5)
 
-        self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(0,2))
+        self.label = self.create_label(frame=self.countdownFrame, text=f"{value} : 59", style='TLabel', grid=(3,1))
         
         
         end_time = (value)*60
