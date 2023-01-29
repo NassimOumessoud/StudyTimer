@@ -22,7 +22,7 @@ class StudyTimer():
     def __init__(self):
         main = tk.Tk()
         main.title('StudyTimer')
-        main.iconbitmap('icons/read_book_study_icon-icons.com_51077.ico')
+        main.iconbitmap('E:/projects/studytimer/icons/icon.ico')
         main.geometry('420x200')
         self.main = main
         self.paused = False
@@ -35,7 +35,7 @@ class StudyTimer():
         self.style()
         self.timer = False
         self.setup_widget()
-        self.create_menu(items={"Exit": self.main.destroy, "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
+        self.create_menu(items={"Exit": self.main.destroy, "Options": [("Alarm", None), ("Background", None), ("Icons", None)], "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
         
         main.mainloop()
         
@@ -108,15 +108,27 @@ class StudyTimer():
         ttk.Button(self.setupFrame, text="Start", command=threading.Thread(target=self.init_countdown).start).grid(column=0, row=5)
 
 
-    def create_menu(self, items={}):
+    def create_menu(self, items={}, cascade=False):
+        """Creates a standard menubar. 
+        If cascade is True takes a list of tuples with first item label and second item command to add to cascade."""
         from tkinter import Menu
+        self.main.option_add('*tearOff', False)
         menubar = Menu(self.main)
         self.main.config(menu=menubar)
 
         menu_file = Menu(menubar)
 
         for item in items:
-            menubar.add_command(label=item, command=items[item])
+            command = items[item]
+
+            if type(command) == list:
+                sub_menu = Menu(menubar)
+                menubar.add_cascade(menu=sub_menu, label=item)
+                for i in command:
+                    sub_menu.add_command(label=i[0], command=i[1])
+                continue
+
+            menubar.add_command(label=item, command=command)
 
 
     def create_label(self, frame=None, text='', style='TLabel', grid=(0,0), cspan=1, rspan=1, packing=False):
@@ -164,7 +176,7 @@ class StudyTimer():
         break_line = random.choice(break_lines)
 
         self.countdownFrame = ttk.Frame(self.main, style='TLabel', padding=10)
-        self.countdownFrame.grid(row=1, column=1)
+        self.countdownFrame.grid(row=0, column=0)
         self.pausebutton = ttk.Button(self.countdownFrame, text="Pause", command=self.pause)
         self.pausebutton.grid(row=5, column=0)
 
@@ -228,7 +240,7 @@ class StudyTimer():
 
             if value == 0:
                 if secs == 6:
-                    self.play_sound('audio/alarm.mp3')
+                    self.play_sound('E:/projects/studytimer/audio/alarm.mp3')
              
 
     def play_sound(self, sound_file):
@@ -244,7 +256,7 @@ class Calculator():
         main.title('Calculator')
         main.geometry('350x200')
         self.background_color = '#5dade2'
-        main.iconbitmap('icons/1486395290-09-calculator_80565.ico')
+        main.iconbitmap('E:/projects/studytimer/icons/calculator_icon.ico')
         self.main = main
         self.main.config(bg=self.background_color)
         self.functions = {'exp': self.exponential, 'der': self.derivative, 'int': self.integral, 'log': self.log, 'ln': self.naturalLog}
@@ -262,8 +274,8 @@ class Calculator():
 
         self.frame = ttk.Frame(self.main, style='TFrame')
         self.frame.pack()
-
-        self.entry = ttk.Entry(self.frame, style='TEntry', width=13)
+ 
+        self.entry = ttk.Entry(self.frame, style='TEntry', font=("Arial", 24))
         self.entry.bind('<Return>', self.calculate)
         self.entry.grid(row=0, column=0)
 
