@@ -343,7 +343,15 @@ class Calculator():
     def naturalLog(self):
         self.equation = self.equation.split("(")[1][:-1]
         self.answer = cmath.log(float(self.equation))
-        self.entry.insert(0, self.answer)
+
+        if self.answer.imag == 0:
+            self.answer = round(self.answer.real, 2)
+
+        else:
+            self.answer = complex(round(self.answer.real, 2), round(self.answer.imag, 2))
+
+        self.entry.insert(0, self.answer, 2)
+
 
 
 StudyTimer()
