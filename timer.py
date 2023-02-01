@@ -22,7 +22,8 @@ class StudyTimer():
     def __init__(self):
         main = tk.Tk()
         main.title('StudyTimer')
-        main.iconbitmap('E:/projects/studytimer/icons/icon.ico')
+        self.icon = 'E:/projects/studytimer/icons/icon.ico'
+        main.iconbitmap(self.icon)
         main.geometry('420x200')
         self.main = main
         self.paused = False
@@ -33,9 +34,10 @@ class StudyTimer():
         #tk.Grid.rowconfigure(self.main,1,weight=1)
 
         self.style()
+        self.alarm = 'E:/projects/studytimer/audio/alarm.mp3'
         self.timer = False
         self.setup_widget()
-        self.create_menu(items={"Exit": self.main.destroy, "Options": [("Alarm", None), ("Background", None), ("Icons", None)], "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
+        self.create_menu(items={"Exit": self.main.destroy, "Options": [("Alarm", lambda: self.select_file('alarm')), ("Background", None), ("Icon", lambda: self.select_file('icon'))], "Calculator": Calculator, "Music": None, "Timer": self.setup_timer, "Notes": None, "Help": None})
         
         main.mainloop()
         
@@ -240,12 +242,25 @@ class StudyTimer():
 
             if value == 0:
                 if secs == 6:
-                    self.play_sound('E:/projects/studytimer/audio/alarm.mp3')
+                    self.play_sound(self.alarm)
              
 
     def play_sound(self, sound_file):
         playsound.playsound(sound_file, block=False)
         
+
+    def select_file(self, place):
+        """Select file to replace current file in placeholder."""
+        from tkinter import filedialog
+        file = filedialog.askopenfilename()
+
+        if place == 'alarm':
+            self.alarm = file
+            print(self.alarm)
+
+        if place == 'icon':
+            self.icon = file
+            self.main.iconbitmap(self.icon)
 
 import cmath
 
